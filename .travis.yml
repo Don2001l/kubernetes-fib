@@ -1,0 +1,39 @@
+language: generic
+sudo: required
+services:
+  - docker
+
+before_install: 
+  - docker build -t don2001l/kubernetes-fib -f ./client/Dockerfile.dev ./client
+
+script:
+  - docker run -e CI=true don2001l/kubernetes-fib npm run test -- --coverage
+
+after_success:
+  - docker build -t don2001l/kubernetes-fib-client ./client
+  - docker build -t don2001l/kubernetes-fib-nginx  ./nginx
+  - docker build -t don2001l/kubernetes-fib-server ./server
+  - docker build -t don2001l/kubernetes-fib-worker ./worker
+
+# Login to Docker HUB
+  - echo "$DOCKER_AUTO" | docker login -u "$DOCKER_ID" --password-stdin
+
+# push to Docker HUB 
+  - docker push don2001l/kubernetes-fib-client
+  - docker push don2001l/kubernetes-fib-nginx
+  - docker push don2001l/kubernetes-fib-server
+  - docker push don2001l/kubernetes-fib-worker
+
+# Push to AWS
+#deploy:
+#  edge: true
+#  provider: elasticbeanstalk
+#  region: "us-east-2"
+#  app: "kubernetes-docker"
+#  env: "kubernetes-env"
+#  bucket_name: elasticbeanstalk-us-east-2-693759577295
+#  bucket_path: "kubernetes-docker"
+#  on:
+#    branch: master
+#  access_key_id: "$AWS_ACCESS_KEY"
+#  secret_access_key: "$AWS_SECRET_KEY"
