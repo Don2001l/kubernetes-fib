@@ -4,16 +4,27 @@ services:
   - docker
 
 before_install: 
+#  - openssl aes-256-cbc -K $encrypted_0c35eebf403c_key -iv $encrypted_0c35eebf403c_iv -in not-auth-file.json.enc -out not-auth-file.json -d
+#  - curl https://sdk.cloud.google.com | bash >/dev/null;
+#  - source $HOME/google-cloud-sdk/path.bash.inc
+#  - gcloud components update kubectl
+#  - gcloud auth active-services-account --key-file service-account.json
+#  - gcloud config set project skilful-berm-214822
+#  - gcloud config set compute/zone us-central1-a
+#  - gcloud container cluster get-credentials kubernetes-fib
+
   - docker build -t don2001l/kubernetes-fib -f ./client/Dockerfile.dev ./client
+
 
 script:
   - docker run -e CI=true don2001l/kubernetes-fib npm run test -- --coverage
 
 after_success:
-  - docker build -t don2001l/kubernetes-fib-client ./client
-  - docker build -t don2001l/kubernetes-fib-nginx  ./nginx
-  - docker build -t don2001l/kubernetes-fib-server ./server
-  - docker build -t don2001l/kubernetes-fib-worker ./worker
+deploy: 
+  provider: script
+  script: bash ./deploy.sh 
+  on: 
+    branch:master
 
 # Login to Docker HUB
   - echo "$DOCKER_AUTO" | docker login -u "$DOCKER_ID" --password-stdin
@@ -29,10 +40,10 @@ after_success:
 #  edge: true
 #  provider: elasticbeanstalk
 #  region: "us-east-2"
-#  app: "kubernetes-docker"
-#  env: "kubernetes-env"
+#  app: "multi-docker"
+#  env: "MultiDocker-env"
 #  bucket_name: elasticbeanstalk-us-east-2-693759577295
-#  bucket_path: "kubernetes-docker"
+#  bucket_path: "multi-docker"
 #  on:
 #    branch: master
 #  access_key_id: "$AWS_ACCESS_KEY"
