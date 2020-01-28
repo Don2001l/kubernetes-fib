@@ -13,12 +13,12 @@ class App extends Component {
           <header className="App-header">
             <img src={logo} className="App-logo" alt="logo" />
             <h1 className="App-title">Fib Calculator Kubernetes version 2</h1>
-            <Link to="/">Home</Link>
-            <Link to="/otherpage">Other Page</Link>
+            <Link to="/">Home Page</Link>
+            <Link to="/otherpage">Other Non-Page</Link>
           </header>
           <div>
             <Route exact path="/" component={Fib} />
-            <Route path="/otherpage" component={OtherPage} />
+            <Route path="/otherpage" component={Other Non-Page} />
           </div>
         </div>
       </Router>
